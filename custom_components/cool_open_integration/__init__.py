@@ -40,12 +40,12 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         raise ConfigEntryNotReady() from error
     except InvalidTokenException as error:
         _LOGGER.error("Invalid token, reauthenticating...")
-        username = entry.data["username"]
-        password = entry.data["password"]
         try:
-            token = await CoolAutomationClient.authenticate(username, password)
+            token = await CoolAutomationClient.authenticate(
+                entry.data["username"], entry.data["password"]
+            )
             hass.config_entries.async_update_entry(
-                entry, data={"username": username, "password": password, "token": token}
+                entry, data={**entry.data, "token": token}
             )
             client = await CoolAutomationClient.create(token=token)
         except Exception as error:
