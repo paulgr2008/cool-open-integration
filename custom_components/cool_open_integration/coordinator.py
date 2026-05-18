@@ -34,8 +34,12 @@ class CoolAutomationDataUpdateCoordinator(DataUpdateCoordinator):
         """Fetch data from Coolmaster."""
         try:
             data = {}
+            if any(unit.needs_refresh for unit in self.units):
+                all_states = await self._client.get_all_updated_units()
+                for unit in self.units:
+                    if unit.needs_refresh and unit.id in all_states:
+                        unit.apply_update(all_states[unit.id])
             for unit in self.units:
-                await unit.refresh()
                 data[unit.id] = unit
                 unit.reset_update()
         except OSError as error:
