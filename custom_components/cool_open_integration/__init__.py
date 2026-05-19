@@ -57,7 +57,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         _LOGGER.error("General Error: %s", error)
         raise ConfigEntryNotReady() from error
     try:
-        units_factory = await HVACUnitsFactory.create(token=token)
+        units_factory = HVACUnitsFactory(client=client)
         units = await units_factory.generate_units_from_api()
         if not units:
             raise ConfigEntryNotReady
